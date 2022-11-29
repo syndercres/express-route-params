@@ -2,31 +2,41 @@ import express from "express";
 
 const app = express();
 
+function isVowel(char:string) {
+  if (char.length == 1) {
+    var vowels = new Array("a", "e", "i", "o", "u");
+    var isVowel = false;
+
+    for (let e in vowels) {
+      if (vowels[e] == char) {
+        isVowel = true;
+      }
+    }
+
+    return isVowel;
+  }
+}
+
 app.get("/", (req, res) => {
   res.json({
     message: "Try a more interesting route...",
   });
 });
 
-app.get("/eat/apple", (req, res) => {
+app.get<{food:string}>("/eat/:food", (req, res) => {
+  let pronoun = "a"
+  if(isVowel(req.params.food[0])){
+    pronoun="an"
+  }
+
   res.json({
-    message: "Yum yum - you ate an apple!",
+    message: `Yum yum - you ate ${pronoun} ${req.params.food}!`,
   });
 });
 
-app.get("/eat/banana", (req, res) => {
-  res.json({
-    message: "Yum yum - you ate a banana!",
-  });
-});
 
-app.get("/eat/carrot", (req, res) => {
-  res.json({
-    message: "Yum yum - you ate a carrot!",
-  });
-});
 
-app.get("/echo/:exampleRouteParameter", (req, res) => {
+app.get<{exampleRouteParameter:string}>("/echo/:exampleRouteParameter", (req, res) => {
   const echoContent = req.params.exampleRouteParameter;
   res.json({
     echo: echoContent,
@@ -34,7 +44,15 @@ app.get("/echo/:exampleRouteParameter", (req, res) => {
   });
 });
 
-app.get("/multiply/:numOne/:numTwo", (req, res) => {
+app.get<{exampleRouteParameter:string}>("/shout/:exampleRouteParameter", (req, res) => {
+  const echoContent = req.params.exampleRouteParameter;
+  res.json({
+    shout: echoContent,
+    message: `I am shouting back to you: ${echoContent.toUpperCase()}!`,
+  });
+});
+
+app.get<{numOne:number, numTwo:number}>("/multiply/:numOne/:numTwo", (req, res) => {
   /**
    * Note that `numOne` and `numTwo` are both typed as string.
    * (Hover over with your mouse to see!)
@@ -43,9 +61,20 @@ app.get("/multiply/:numOne/:numTwo", (req, res) => {
    * are parsed by Express.
    */
   const { numOne, numTwo } = req.params;
-  const multiplication = parseInt(numOne) * parseInt(numTwo);
+  const multiplication = numOne * numTwo;
   res.json({
     original: `${numOne} x ${numTwo}`,
+    result: multiplication,
+  });
+});
+
+
+app.get<{numOne:number, numTwo:number, numThree: number}>("/add/:numOne/:numTwo/:numThree", (req, res) => {
+
+  const { numOne, numTwo, numThree } = req.params;
+  const multiplication = numOne - - numTwo - - numThree;
+  res.json({
+    original: `${numOne} + ${numTwo} + ${numThree}`,
     result: multiplication,
   });
 });
